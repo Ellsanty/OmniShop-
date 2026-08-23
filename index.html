@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="OmniShop — Tienda de tecnología futurista: componentes, portátiles, monitores y periféricos. Precios reales, fichas técnicas y carrito sin registro.">
+<title>OmniShop ▮ Tecnología del futuro, hoy</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap hbar">
+    <a class="logo" href="index.html">OmniShop<b>▮</b></a>
+    <nav class="links">
+      <a href="#catalogo">Catálogo</a>
+      <a href="#catalogo" data-jump="GPUs">GPUs</a>
+      <a href="#catalogo" data-jump="Portátiles">Portátiles</a>
+      <a href="#catalogo" data-jump="Monitores">Monitores</a>
+    </nav>
+    <div class="search">
+      <span>🔍</span>
+      <input id="buscador" type="text" placeholder="Busca GPU, procesador, monitor…" aria-label="Buscar productos">
+    </div>
+    <button class="btn btn-ghost" id="btn-login">Entrar</button>
+    <a class="cart-btn" href="carrito.html" aria-label="Ir al carrito">🛒 Carrito <span class="cnt hide" id="cart-cnt">0</span></a>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="orb o1"></div><div class="orb o2"></div>
+  <div class="wrap">
+    <h1>Tecnología del <span>futuro</span>, hoy.</h1>
+    <p>Componentes para armar tu PC, portátiles, monitores y periféricos de última generación — con precios reales, fichas técnicas completas y envío gratis desde $99. Sin registro para navegar.</p>
+    <div class="cta">
+      <button class="btn btn-grad" id="go-catalogo">Explorar catálogo →</button>
+      <button class="btn btn-ghost" id="go-ofertas">Ofertas de la semana</button>
+    </div>
+    <div class="stats">
+      <div><b><em>500+</em></b>productos verificados</div>
+      <div><b><em>4.8★</em></b>valoración media</div>
+      <div><b><em>24/7</em></b>soporte técnico</div>
+      <div><b><em>12m</em></b>garantía incluida</div>
+    </div>
+  </div>
+</section>
+
+<main class="wrap" id="catalogo">
+  <div class="toolbar">
+    <div class="chips" id="chips"></div>
+    <select class="sort" id="orden" aria-label="Ordenar productos">
+      <option value="reco">Recomendados</option>
+      <option value="precio-asc">Precio: menor a mayor</option>
+      <option value="precio-desc">Precio: mayor a menor</option>
+      <option value="rating">Mejor valorados</option>
+    </select>
+  </div>
+  <div class="grid" id="grid"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <a class="logo" href="index.html" style="font-size:18px">OmniShop<b>▮</b></a>
+        <p style="color:var(--mut);font-size:12.5px;margin-top:8px;max-width:220px">La tienda de tecnología con estética del futuro. Precios reales, fichas técnicas y envío rápido.</p>
+      </div>
+      <div><h4>Categorías</h4><ul><li>GPUs y tarjetas gráficas</li><li>Procesadores</li><li>Portátiles</li><li>Monitores</li><li>Periféricos</li></ul></div>
+      <div><h4>Soporte</h4><ul><li>Envíos y entregas</li><li>Garantías</li><li>Guía para armar tu PC</li><li>Contacto 24/7</li></ul></div>
+      <div><h4>OmniShop</h4><ul><li>Sobre nosotros</li><li>Proyecto · v0.1 prototipo</li><li>Login: próximamente</li><li>Pagos: próximamente</li></ul></div>
+    </div>
+    <div class="fcopy">© 2026 OmniShop · Prototipo de tienda — hecho con ⚡ y neón</div>
+  </div>
+</footer>
+
+<!-- MODAL FICHA DE PRODUCTO -->
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+  <div class="box" id="modal-box"></div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

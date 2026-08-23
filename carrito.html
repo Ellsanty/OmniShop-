@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="OmniShop — Tu carrito de compras: revisa lo pendiente, cambia cantidades y finaliza tu pedido.">
+<title>OmniShop ▮ Tu carrito</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header>
+  <div class="wrap hbar">
+    <a class="logo" href="index.html">OmniShop<b>▮</b></a>
+    <nav class="links">
+      <a href="index.html#catalogo">Catálogo</a>
+      <a href="index.html#catalogo">GPUs</a>
+      <a href="index.html#catalogo">Portátiles</a>
+      <a href="index.html#catalogo">Monitores</a>
+    </nav>
+    <a class="cart-btn" href="carrito.html" aria-label="Ir al carrito">🛒 Carrito <span class="cnt hide" id="cart-cnt">0</span></a>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="crumbs">Inicio / <b>Carrito</b></div>
+  <h2 class="cart-h">🛒 Tu carrito <span id="cart-count"></span></h2>
+
+  <div class="cart-layout">
+    <section class="cart-items" id="cart-list"><!-- los productos se dibujan aquí --></section>
+    <aside class="cart-summary" id="cart-summary"><!-- resumen del pedido aquí --></aside>
+  </div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="fcols">
+      <div>
+        <a class="logo" href="index.html" style="font-size:18px">OmniShop<b>▮</b></a>
+        <p style="color:var(--mut);font-size:12.5px;margin-top:8px;max-width:220px">La tienda de tecnología con estética del futuro. Precios reales, fichas técnicas y envío rápido.</p>
+      </div>
+      <div><h4>Categorías</h4><ul><li>GPUs y tarjetas gráficas</li><li>Procesadores</li><li>Portátiles</li><li>Monitores</li><li>Periféricos</li></ul></div>
+      <div><h4>Soporte</h4><ul><li>Envíos y entregas</li><li>Garantías</li><li>Guía para armar tu PC</li><li>Contacto 24/7</li></ul></div>
+      <div><h4>OmniShop</h4><ul><li>Sobre nosotros</li><li>Proyecto · v0.1 prototipo</li><li>Login: próximamente</li><li>Pagos: próximamente</li></ul></div>
+    </div>
+    <div class="fcopy">© 2026 OmniShop · Prototipo de tienda — hecho con ⚡ y neón</div>
+  </div>
+</footer>
+
+<!-- MODAL CONFIRMACIÓN DE PEDIDO -->
+<div class="modal" id="modal-ok" role="dialog" aria-modal="true">
+  <div class="box" style="max-width:440px;text-align:center">
+    <button class="close-m" id="ok-cerrar" aria-label="Cerrar">✕</button>
+    <div style="font-size:44px;margin:6px 0 8px">🚀</div>
+    <h3 style="font-size:19px">¡Pedido registrado!</h3>
+    <p id="ok-info" style="color:var(--mut);font-size:13px;margin-top:8px;line-height:1.6"></p>
+    <button class="checkout" id="ok-btn" style="margin-top:16px">Seguir comprando</button>
+    <p class="note">El <b>login</b> y el <b>pago en línea</b> llegan en la siguiente fase del proyecto — por ahora todo se guarda en tu navegador.</p>
+  </div>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script src="script.js"></script>
+</body>
+</html>

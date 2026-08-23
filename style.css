@@ -94,6 +94,7 @@ nav.links a:hover{color:var(--txt);background:rgba(255,255,255,.06)}
 .card .art{background:rgba(5,8,20,.6);border:1px solid var(--line);border-radius:12px;padding:10px;
   display:flex;align-items:center;justify-content:center;position:relative}
 .card .art svg{width:100%;height:auto;max-height:96px}
+.product-image{display:block;width:100%;height:150px;object-fit:contain;border-radius:8px}
 .badge{position:absolute;top:22px;left:22px;font-size:10.5px;font-weight:800;letter-spacing:.4px;
   border-radius:999px;padding:3px 9px;z-index:2;white-space:nowrap;pointer-events:none}
 .badge.dest{background:var(--grad);color:#04121a;left:22px;right:auto}
@@ -174,6 +175,7 @@ nav.links a:hover{color:var(--txt);background:rgba(255,255,255,.06)}
 .modal .big{display:flex;gap:20px;flex-wrap:wrap;margin:14px 0}
 .modal .big .art{flex:1 1 220px;background:rgba(5,8,20,.6);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:center}
 .modal .big .art svg{width:100%;max-height:150px}
+.modal .big .art .product-image{height:190px}
 .modal .big .meta{flex:1 1 220px}
 .modal h3{font-size:20px;line-height:1.25;overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
 .specs{list-style:none;margin:12px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
@@ -195,6 +197,7 @@ nav.links a:hover{color:var(--txt);background:rgba(255,255,255,.06)}
 .note{font-size:12px;color:var(--mut);margin-top:12px;line-height:1.6;overflow-wrap:anywhere;word-break:break-word}
 .close-m{position:absolute;top:14px;right:16px;background:none;border:0;color:var(--mut);font-size:22px;cursor:pointer}
 .close-m:hover{color:var(--txt)}
+.cart-item .tart .product-image{width:100%;height:100%;object-fit:contain;border-radius:6px}
 
 /* ---------- TOAST ---------- */
 .toasts{position:fixed;top:18px;right:18px;z-index:120;display:flex;flex-direction:column;gap:8px}

@@ -8,22 +8,22 @@ const ENVIO_GRATIS = 99;
 const ENVIO = 9.99;
 
 const PRODUCTOS = [
-  { id: 'gpu-5070ti', nombre: 'RTX 5070 Ti 16GB', marca: 'NVIDIA', cat: 'GPUs', precio: 899, antes: 1049, rating: 4.8, stock: 14, dest: true, specs: ['Memoria', '16 GB GDDR7', 'Chip', 'Blackwell · 8,960 núcleos CUDA', 'Boost', '2,850 MHz', 'Consumo', '300 W', 'Extras', 'DLSS 4 + Ray Tracing', 'Conector', 'PCIe 5.0 · 16 pines'], art: 'gpu' },
-  { id: 'gpu-4060', nombre: 'RTX 4060 8GB', marca: 'NVIDIA', cat: 'GPUs', precio: 299, antes: 339, rating: 4.6, stock: 32, dest: false, specs: ['Memoria', '8 GB GDDR6', 'Chip', 'Ada Lovelace · 3,072 núcleos', 'Boost', '2,445 MHz', 'Consumo', '115 W', 'Extras', 'DLSS 3 + Frame Generation'], art: 'gpu' },
-  { id: 'cpu-7800x3d', nombre: 'Ryzen 7 7800X3D', marca: 'AMD', cat: 'CPUs', precio: 369, antes: 449, rating: 4.9, stock: 21, dest: true, specs: ['Núcleos / Hilos', '8 / 16', 'Caché', '96 MB L3 (3D V-Cache)', 'Frecuencia', '4.2 / 5.0 GHz', 'Socket', 'AM5', 'TDP', '120 W', 'Extras', 'Ideal para gaming'], art: 'cpu' },
-  { id: 'cpu-7600', nombre: 'Ryzen 5 7600', marca: 'AMD', cat: 'CPUs', precio: 199, antes: 219, rating: 4.7, stock: 40, dest: false, specs: ['Núcleos / Hilos', '6 / 12', 'Caché', '32 MB L3', 'Frecuencia', '3.8 / 5.1 GHz', 'Socket', 'AM5', 'TDP', '65 W'], art: 'cpu' },
-  { id: 'ram-vengeance', nombre: 'Vengeance 32GB DDR5 6000', marca: 'Corsair', cat: 'Memoria y SSD', precio: 109, antes: 129, rating: 4.8, stock: 48, dest: false, specs: ['Capacidad', '2 × 16 GB', 'Velocidad', '6,000 MT/s CL30', 'Compatibilidad', 'AMD EXPO · Intel XMP 3.0', 'Extras', 'RGB direccionable', 'Voltaje', '1.35 V'], art: 'ram' },
-  { id: 'ssd-990', nombre: '990 EVO Plus 1TB NVMe', marca: 'Samsung', cat: 'Memoria y SSD', precio: 89, antes: 109, rating: 4.7, stock: 55, dest: false, specs: ['Capacidad', '1 TB', 'Interfaz', 'PCIe 4.0 x4 · M.2 2280', 'Lectura', 'Hasta 7,000 MB/s', 'Escritura', 'Hasta 6,000 MB/s', 'Garantía', '5 años'], art: 'ssd' },
-  { id: 'lap-rog', nombre: 'ROG Strix G16', marca: 'ASUS', cat: 'Portátiles', precio: 1249, antes: 1399, rating: 4.8, stock: 9, dest: true, specs: ['Procesador', 'Intel Core i7-13650HX', 'GPU', 'RTX 4060 8GB', 'RAM', '16 GB DDR5', 'Almacenamiento', '1 TB SSD', 'Pantalla', '16" FHD+ 165Hz', 'Extras', 'Teclado RGB · Wi-Fi 6E'], art: 'laptop' },
-  { id: 'lap-ideapad', nombre: 'IdeaPad Slim 5', marca: 'Lenovo', cat: 'Portátiles', precio: 649, antes: 719, rating: 4.5, stock: 17, dest: false, specs: ['Procesador', 'AMD Ryzen 7 7735HS', 'GPU', 'Radeon integrada', 'RAM', '16 GB DDR5', 'Almacenamiento', '512 GB SSD', 'Pantalla', '15.6" FHD IPS', 'Peso', '1.6 kg'], art: 'laptop' },
-  { id: 'mon-27qhd', nombre: 'Monitor 27" QHD 165Hz', marca: 'LG', cat: 'Monitores', precio: 279, antes: 319, rating: 4.6, stock: 26, dest: true, specs: ['Panel', 'IPS · 2,560 × 1,440', 'Tasa de refresco', '165 Hz', 'Tiempo de respuesta', '1 ms', 'HDR', 'HDR10', 'Extras', 'G-Sync compatible · 99% sRGB'], art: 'monitor' },
-  { id: 'mon-34uw', nombre: 'Monitor 34" Ultrawide 144Hz', marca: 'Xiaomi', cat: 'Monitores', precio: 449, antes: 499, rating: 4.4, stock: 12, dest: false, specs: ['Panel', 'VA · 3,440 × 1,440', 'Relación', '21:9 curvo', 'Tasa de refresco', '144 Hz', 'HDR', 'HDR400', 'Extras', 'USB-C 65W · altavoces'], art: 'monitor' },
-  { id: 'mon-24fhd', nombre: 'Monitor 24" FHD 180Hz', marca: 'AOC', cat: 'Monitores', precio: 139, antes: 159, rating: 4.5, stock: 38, dest: false, specs: ['Panel', 'VA · 1,920 × 1,080', 'Tasa de refresco', '180 Hz', 'Tiempo de respuesta', '1 ms', 'Extras', 'FreeSync · bordes delgados'], art: 'monitor' },
-  { id: 'kb-75', nombre: 'Teclado mecánico 75% RGB', marca: 'Keychron', cat: 'Periféricos', precio: 99, antes: 119, rating: 4.7, stock: 33, dest: false, specs: ['Formato', '75% · hot-swap', 'Switches', 'Rojos lineales', 'Conexión', 'Bluetooth · 2.4G · USB-C', 'Keycaps', 'PBT doble inyección', 'Extras', 'RGB por tecla'], art: 'kb' },
-  { id: 'mouse-pro', nombre: 'Mouse inalámbrico 26K DPI', marca: 'Logitech', cat: 'Periféricos', precio: 59, antes: 69, rating: 4.6, stock: 60, dest: false, specs: ['Sensor', 'HERO 26K', 'Peso', '61 g', 'Conexión', '2.4G · Bluetooth', 'Batería', 'Hasta 95 h', 'Extras', '6 botones programables'], art: 'mouse' },
-  { id: 'headset-71', nombre: 'Headset gamer 7.1', marca: 'HyperX', cat: 'Periféricos', precio: 79, antes: 95, rating: 4.5, stock: 28, dest: false, specs: ['Sonido', '7.1 virtual', 'Drivers', '53 mm', 'Micrófono', 'Desmontable · cancelación', 'Conexión', '2.4G inalámbrico', 'Autonomía', '30 h'], art: 'headset' },
-  { id: 'psu-850', nombre: 'Fuente 850W 80+ Gold', marca: 'Corsair', cat: 'Fuentes y refrigeración', precio: 119, antes: 139, rating: 4.7, stock: 22, dest: false, specs: ['Potencia', '850 W · 80+ Gold', 'Modular', 'Full modular', 'Estándar', 'ATX 3.0 · PCIe 5.0', 'Ventilador', '140 mm hidráulico', 'Garantía', '10 años'], art: 'psu' },
-  { id: 'aio-240', nombre: 'Refrigeración líquida 240mm RGB', marca: 'NZXT', cat: 'Fuentes y refrigeración', precio: 89, antes: 109, rating: 4.4, stock: 18, dest: false, specs: ['Radiador', '240 mm · 2 × 120 mm', 'Bomba', '3,000 RPM', 'Socket', 'AM5 · LGA1700', 'Extras', 'RGB direccionable', 'Ruido', 'Máx. 32 dB'], art: 'aio' }
+  { id: 'gpu-5070ti', nombre: 'RTX 5070 Ti 16GB', marca: 'NVIDIA', cat: 'GPUs', precio: 899, antes: 1049, rating: 4.8, stock: 14, dest: true, specs: ['Memoria', '16 GB GDDR7', 'Chip', 'Blackwell · 8,960 núcleos CUDA', 'Boost', '2,850 MHz', 'Consumo', '300 W', 'Extras', 'DLSS 4 + Ray Tracing', 'Conector', 'PCIe 5.0 · 16 pines'], art: 'gpu', image: 'img/GeForce-RTX™-5070-Ti-WINDFORCE-OC-SFF-16G-01.png' },
+  { id: 'gpu-4060', nombre: 'RTX 4060 8GB', marca: 'NVIDIA', cat: 'GPUs', precio: 299, antes: 339, rating: 4.6, stock: 32, dest: false, specs: ['Memoria', '8 GB GDDR6', 'Chip', 'Ada Lovelace · 3,072 núcleos', 'Boost', '2,445 MHz', 'Consumo', '115 W', 'Extras', 'DLSS 3 + Frame Generation'], art: 'gpu', image: 'img/images (3).jpg' },
+  { id: 'cpu-7800x3d', nombre: 'Ryzen 7 7800X3D', marca: 'AMD', cat: 'CPUs', precio: 369, antes: 449, rating: 4.9, stock: 21, dest: true, specs: ['Núcleos / Hilos', '8 / 16', 'Caché', '96 MB L3 (3D V-Cache)', 'Frecuencia', '4.2 / 5.0 GHz', 'Socket', 'AM5', 'TDP', '120 W', 'Extras', 'Ideal para gaming'], art: 'cpu', image: 'img/51HqC0rU9HL._AC_SL1500_.jpg' },
+  { id: 'cpu-7600', nombre: 'Ryzen 5 7600', marca: 'AMD', cat: 'CPUs', precio: 199, antes: 219, rating: 4.7, stock: 40, dest: false, specs: ['Núcleos / Hilos', '6 / 12', 'Caché', '32 MB L3', 'Frecuencia', '3.8 / 5.1 GHz', 'Socket', 'AM5', 'TDP', '65 W'], art: 'cpu', image: 'img/D_NQ_NP_719037-MLA99972093783_112025-O.webp' },
+  { id: 'ram-vengeance', nombre: 'Vengeance 32GB DDR5 6000', marca: 'Corsair', cat: 'Memoria y SSD', precio: 109, antes: 129, rating: 4.8, stock: 48, dest: false, specs: ['Capacidad', '2 × 16 GB', 'Velocidad', '6,000 MT/s CL30', 'Compatibilidad', 'AMD EXPO · Intel XMP 3.0', 'Extras', 'RGB direccionable', 'Voltaje', '1.35 V'], art: 'ram', image: 'img/20-236-909-02_square.jpg' },
+  { id: 'ssd-990', nombre: '990 EVO Plus 1TB NVMe', marca: 'Samsung', cat: 'Memoria y SSD', precio: 89, antes: 109, rating: 4.7, stock: 55, dest: false, specs: ['Capacidad', '1 TB', 'Interfaz', 'PCIe 4.0 x4 · M.2 2280', 'Lectura', 'Hasta 7,000 MB/s', 'Escritura', 'Hasta 6,000 MB/s', 'Garantía', '5 años'], art: 'ssd', image: 'img/Samsung_1TB_990_EVO_Plus_BOX_1000x_02e0faf0-37cb-4fc2-8275-c58fdfb584fb.webp' },
+  { id: 'lap-rog', nombre: 'ROG Strix G16', marca: 'ASUS', cat: 'Portátiles', precio: 1249, antes: 1399, rating: 4.8, stock: 9, dest: true, specs: ['Procesador', 'Intel Core i7-13650HX', 'GPU', 'RTX 4060 8GB', 'RAM', '16 GB DDR5', 'Almacenamiento', '1 TB SSD', 'Pantalla', '16" FHD+ 165Hz', 'Extras', 'Teclado RGB · Wi-Fi 6E'], art: 'laptop', image: 'img/images.jpg' },
+  { id: 'lap-ideapad', nombre: 'IdeaPad Slim 5', marca: 'Lenovo', cat: 'Portátiles', precio: 649, antes: 719, rating: 4.5, stock: 17, dest: false, specs: ['Procesador', 'AMD Ryzen 7 7735HS', 'GPU', 'Radeon integrada', 'RAM', '16 GB DDR5', 'Almacenamiento', '512 GB SSD', 'Pantalla', '15.6" FHD IPS', 'Peso', '1.6 kg'], art: 'laptop', image: 'img/w=1500,h=1500,fit=cover.webp' },
+  { id: 'mon-27qhd', nombre: 'Monitor 27" QHD 165Hz', marca: 'LG', cat: 'Monitores', precio: 279, antes: 319, rating: 4.6, stock: 26, dest: true, specs: ['Panel', 'IPS · 2,560 × 1,440', 'Tasa de refresco', '165 Hz', 'Tiempo de respuesta', '1 ms', 'HDR', 'HDR10', 'Extras', 'G-Sync compatible · 99% sRGB'], art: 'monitor', image: 'img/images (1).jpg' },
+  { id: 'mon-34uw', nombre: 'Monitor 34" Ultrawide 144Hz', marca: 'Xiaomi', cat: 'Monitores', precio: 449, antes: 499, rating: 4.4, stock: 12, dest: false, specs: ['Panel', 'VA · 3,440 × 1,440', 'Relación', '21:9 curvo', 'Tasa de refresco', '144 Hz', 'HDR', 'HDR400', 'Extras', 'USB-C 65W · altavoces'], art: 'monitor', image: 'img/images (5).jpg' },
+  { id: 'mon-24fhd', nombre: 'Monitor 24" FHD 180Hz', marca: 'AOC', cat: 'Monitores', precio: 139, antes: 159, rating: 4.5, stock: 38, dest: false, specs: ['Panel', 'VA · 1,920 × 1,080', 'Tasa de refresco', '180 Hz', 'Tiempo de respuesta', '1 ms', 'Extras', 'FreeSync · bordes delgados'], art: 'monitor', image: 'img/images (4).jpg' },
+  { id: 'kb-75', nombre: 'Teclado mecánico 75% RGB', marca: 'Keychron', cat: 'Periféricos', precio: 99, antes: 119, rating: 4.7, stock: 33, dest: false, specs: ['Formato', '75% · hot-swap', 'Switches', 'Rojos lineales', 'Conexión', 'Bluetooth · 2.4G · USB-C', 'Keycaps', 'PBT doble inyección', 'Extras', 'RGB por tecla'], art: 'kb', image: 'img/images (2).jpg' },
+  { id: 'mouse-pro', nombre: 'Mouse inalámbrico 26K DPI', marca: 'Logitech', cat: 'Periféricos', precio: 59, antes: 69, rating: 4.6, stock: 60, dest: false, specs: ['Sensor', 'HERO 26K', 'Peso', '61 g', 'Conexión', '2.4G · Bluetooth', 'Batería', 'Hasta 95 h', 'Extras', '6 botones programables'], art: 'mouse', image: 'img/D_NQ_NP_607996-MLA100010457619_122025-O.webp' },
+  { id: 'headset-71', nombre: 'Headset gamer 7.1', marca: 'HyperX', cat: 'Periféricos', precio: 79, antes: 95, rating: 4.5, stock: 28, dest: false, specs: ['Sonido', '7.1 virtual', 'Drivers', '53 mm', 'Micrófono', 'Desmontable · cancelación', 'Conexión', '2.4G inalámbrico', 'Autonomía', '30 h'], art: 'headset', image: 'img/1_bf44a5e1-bfad-426b-9666-9ab7b10ee719.webp' },
+  { id: 'psu-850', nombre: 'Fuente 850W 80+ Gold', marca: 'Corsair', cat: 'Fuentes y refrigeración', precio: 119, antes: 139, rating: 4.7, stock: 22, dest: false, specs: ['Potencia', '850 W · 80+ Gold', 'Modular', 'Full modular', 'Estándar', 'ATX 3.0 · PCIe 5.0', 'Ventilador', '140 mm hidráulico', 'Garantía', '10 años'], art: 'psu', image: 'img/D_NQ_NP_930241-MLA99522507928_122025-O.webp' },
+  { id: 'aio-240', nombre: 'Refrigeración líquida 240mm RGB', marca: 'NZXT', cat: 'Fuentes y refrigeración', precio: 89, antes: 109, rating: 4.4, stock: 18, dest: false, specs: ['Radiador', '240 mm · 2 × 120 mm', 'Bomba', '3,000 RPM', 'Socket', 'AM5 · LGA1700', 'Extras', 'RGB direccionable', 'Ruido', 'Máx. 32 dB'], art: 'aio', image: 'img/images (6).jpg' }
 ];
 
 const fmt = n => MONEDA + n.toLocaleString('en-US');
@@ -49,6 +49,12 @@ function svgArt(kind, seed) {
     default: '<rect x="22" y="26" width="76" height="32" rx="8" fill="url(#' + g + ')" opacity=".15"/><circle cx="50" cy="42" r="10" fill="url(#' + g + ')" opacity=".55"/><circle cx="70" cy="42" r="10" fill="url(#' + g + ')" opacity=".55"/>'
   };
   return open + defs + (shapes[kind] || shapes.default) + '</svg>';
+}
+
+function productArt(product) {
+  return product.image
+    ? `<img class="product-image" src="${product.image}" alt="${product.nombre}" loading="lazy">`
+    : svgArt(product.art, product.id);
 }
 
 const state = {
@@ -149,7 +155,7 @@ function renderCatalog() {
       <div class="art">
         ${p.dest ? '<span class="badge dest">DESTACADO</span>' : ''}
         ${p.antes && p.antes > p.precio ? '<span class="badge off">OFERTA</span>' : ''}
-        ${svgArt(p.art, p.id)}
+        ${productArt(p)}
       </div>
       <div class="brand">${p.marca}</div>
       <h3>${p.nombre}</h3>
@@ -181,7 +187,7 @@ function openModal(productId) {
   box.innerHTML = `
     <button class="close-m" aria-label="Cerrar" data-close="modal">✕</button>
     <div class="big">
-      <div class="art">${svgArt(product.art, product.id)}</div>
+      <div class="art">${productArt(product)}</div>
       <div class="meta">
         <div class="brand">${product.marca}</div>
         <h3>${product.nombre}</h3>
@@ -308,7 +314,7 @@ function renderCart() {
 
   list.innerHTML = items.map(item => `
     <div class="cart-item">
-      <div class="tart">${svgArt(item.art, item.id)}</div>
+      <div class="tart">${productArt(item)}</div>
       <div class="cinfor">
         <div class="cname">${item.nombre}</div>
         <div class="cbrand">${item.marca}</div>

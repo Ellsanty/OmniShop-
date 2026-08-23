@@ -95,20 +95,21 @@ nav.links a:hover{color:var(--txt);background:rgba(255,255,255,.06)}
   display:flex;align-items:center;justify-content:center;position:relative}
 .card .art svg{width:100%;height:auto;max-height:96px}
 .badge{position:absolute;top:22px;left:22px;font-size:10.5px;font-weight:800;letter-spacing:.4px;
-  border-radius:999px;padding:3px 9px;z-index:2}
-.badge.dest{background:var(--grad);color:#04121a}
-.badge.off{background:rgba(251,113,133,.16);color:var(--red);border:1px solid rgba(251,113,133,.4)}
-.brand{font-size:11px;color:var(--cyan);font-weight:700;letter-spacing:.6px;text-transform:uppercase}
-.card h3{font-size:15px;font-weight:700;line-height:1.3}
+  border-radius:999px;padding:3px 9px;z-index:2;white-space:nowrap;pointer-events:none}
+.badge.dest{background:var(--grad);color:#04121a;left:22px;right:auto}
+.badge.off{background:rgba(251,113,133,.16);color:var(--red);border:1px solid rgba(251,113,133,.4);left:auto;right:22px}
+.brand{font-size:11px;color:var(--cyan);font-weight:700;letter-spacing:.6px;text-transform:uppercase;
+  overflow-wrap:anywhere;word-break:break-word}
+.card h3{font-size:15px;font-weight:700;line-height:1.3;overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
 .rate{font-size:12px;color:var(--amber)}
 .rate span{color:var(--dim)}
-.specs-mini{font-size:11.5px;color:var(--mut);line-height:1.5;font-family:var(--mono)}
+.specs-mini{font-size:11.5px;color:var(--mut);line-height:1.5;font-family:var(--mono);overflow-wrap:anywhere;word-break:break-word}
 .prow{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
-.price{font-size:20px;font-weight:800;color:var(--txt)}
+.price{font-size:20px;font-weight:800;color:var(--txt);overflow-wrap:anywhere;word-break:break-word}
 .price b{color:var(--cyan)}
-.before{font-size:12px;color:var(--dim);text-decoration:line-through}
-.off-tag{font-size:11px;color:var(--green);font-weight:700}
-.stock{font-size:11px;color:var(--green)}
+.before{font-size:12px;color:var(--dim);text-decoration:line-through;overflow-wrap:anywhere;word-break:break-word}
+.off-tag{font-size:11px;color:var(--green);font-weight:700;overflow-wrap:anywhere;word-break:break-word}
+.stock{font-size:11px;color:var(--green);overflow-wrap:anywhere;word-break:break-word}
 .stock.low{color:var(--amber)}
 .stock.out{color:var(--red)}
 .cactions{display:flex;gap:8px;margin-top:auto}
@@ -132,13 +133,13 @@ nav.links a:hover{color:var(--txt);background:rgba(255,255,255,.06)}
   border-radius:10px;padding:6px;display:flex;align-items:center;justify-content:center}
 .cart-item .tart svg{width:100%;height:100%}
 .cinfor{flex:1;min-width:170px}
-.cname{font-size:14px;font-weight:700;line-height:1.25}
-.cbrand{font-size:11px;color:var(--cyan);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-top:3px}
-.cunit{font-size:12px;color:var(--mut);margin-top:2px}
+.cname{font-size:14px;font-weight:700;line-height:1.25;overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
+.cbrand{font-size:11px;color:var(--cyan);font-weight:700;letter-spacing:.6px;text-transform:uppercase;margin-top:3px;overflow-wrap:anywhere;word-break:break-word}
+.cunit{font-size:12px;color:var(--mut);margin-top:2px;overflow-wrap:anywhere;word-break:break-word}
 .cart-item .qty{margin-top:8px}
 .cart-item .qty button{width:26px;height:26px;font-size:14px}
 .ctot{text-align:right;min-width:96px}
-.ctot .v{font-size:17px;font-weight:800;color:var(--cyan)}
+.ctot .v{font-size:17px;font-weight:800;color:var(--cyan);overflow-wrap:anywhere;word-break:break-word}
 .ctot .rm{background:none;border:0;color:var(--dim);font-size:15px;cursor:pointer;padding:4px;margin-top:4px}
 .ctot .rm:hover{color:var(--red)}
 .cart-summary{position:sticky;top:84px;background:rgba(255,255,255,.05);border:1px solid var(--line2);
@@ -174,12 +175,12 @@ nav.links a:hover{color:var(--txt);background:rgba(255,255,255,.06)}
 .modal .big .art{flex:1 1 220px;background:rgba(5,8,20,.6);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;align-items:center;justify-content:center}
 .modal .big .art svg{width:100%;max-height:150px}
 .modal .big .meta{flex:1 1 220px}
-.modal h3{font-size:20px;line-height:1.25}
+.modal h3{font-size:20px;line-height:1.25;overflow-wrap:anywhere;word-break:break-word;hyphens:auto}
 .specs{list-style:none;margin:12px 0;border:1px solid var(--line);border-radius:12px;overflow:hidden}
-.specs li{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--line)}
+.specs li{display:flex;justify-content:space-between;gap:10px;padding:9px 14px;font-size:12.5px;border-bottom:1px solid var(--line);overflow-wrap:anywhere;word-break:break-word}
 .specs li:last-child{border-bottom:0}
-.specs li span{color:var(--mut)}
-.specs li b{font-weight:600;text-align:right;font-family:var(--mono);font-size:12px}
+.specs li span{color:var(--mut);overflow-wrap:anywhere;word-break:break-word}
+.specs li b{font-weight:600;text-align:right;font-family:var(--mono);font-size:12px;overflow-wrap:anywhere;word-break:break-word}
 .qty{display:flex;align-items:center;gap:8px}
 .qty button{width:22px;height:22px;border-radius:6px;border:1px solid var(--line2);background:transparent;color:var(--txt);
   cursor:pointer;font-size:13px;line-height:1}
@@ -189,9 +190,9 @@ nav.links a:hover{color:var(--txt);background:rgba(255,255,255,.06)}
 .buyrow .qty{margin:0}
 .buyrow .qty button{width:30px;height:30px;font-size:15px}
 .buyrow .qty span{font-size:15px;min-width:22px}
-.m-price{font-size:24px;font-weight:800}
+.m-price{font-size:24px;font-weight:800;overflow-wrap:anywhere;word-break:break-word}
 .m-price b{color:var(--cyan)}
-.note{font-size:12px;color:var(--mut);margin-top:12px;line-height:1.6}
+.note{font-size:12px;color:var(--mut);margin-top:12px;line-height:1.6;overflow-wrap:anywhere;word-break:break-word}
 .close-m{position:absolute;top:14px;right:16px;background:none;border:0;color:var(--mut);font-size:22px;cursor:pointer}
 .close-m:hover{color:var(--txt)}
 

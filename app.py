@@ -103,7 +103,8 @@ def inicializar_db():
   cursor.execute("UPDATE usuarios SET email = COALESCE(NULLIF(email, ''), correo)")
   cursor.execute("UPDATE usuarios SET password = COALESCE(NULLIF(password, ''), contrasena)")
   cursor.execute("UPDATE usuarios SET rol = 'cliente' WHERE rol IS NULL OR rol = ''")
-  primer_usuario = cursor.execute("SELECT id FROM usuarios ORDER BY id LIMIT 1").fetchone()
+  cursor.execute("SELECT id FROM usuarios ORDER BY id LIMIT 1")
+  primer_usuario = cursor.fetchone()
   if primer_usuario:
     if isinstance(primer_usuario, dict):
       primer_id = primer_usuario["id"]

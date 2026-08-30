@@ -9,7 +9,14 @@
 <body>
 <header><div class="wrap hbar">
   <a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a>
-  <nav class="links"><a href="{{ url_for('index') }}">Catálogo</a><a href="{{ url_for('mis_pedidos') }}">Mis pedidos</a><a href="{{ url_for('inventario') }}">Inventario</a><a href="{{ url_for('admin_usuarios') }}">Usuarios</a></nav>
+  <nav class="links">
+    <a href="{{ url_for('index') }}">Catálogo</a>
+    <a href="{{ url_for('mis_pedidos') }}">Mis pedidos</a>
+    {% if session.get('usuario_rol') == 'admin' %}
+      <a href="{{ url_for('inventario') }}">Inventario</a>
+      <a href="{{ url_for('admin_usuarios') }}">Usuarios</a>
+    {% endif %}
+  </nav>
   <a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a><form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form>
 </div></header>
 <main class="wrap inventory-page">

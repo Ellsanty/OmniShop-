@@ -7,7 +7,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-<header><div class="wrap hbar"><a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a><nav class="links"><a href="{{ url_for('index') }}">Catálogo</a><a href="{{ url_for('inventario') }}">Inventario</a><a href="{{ url_for('admin_usuarios') }}">Usuarios</a></nav><a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a><form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form></div></header>
+<header><div class="wrap hbar"><a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a><nav class="links"><a href="{{ url_for('index') }}">Catálogo</a>{% if session.get('usuario_rol') == 'admin' %}<a href="{{ url_for('inventario') }}">Inventario</a><a href="{{ url_for('admin_usuarios') }}">Usuarios</a>{% endif %}</nav><a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a><form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form></div></header>
 <main class="wrap inventory-page">
   <div class="crumbs"><a href="{{ url_for('index') }}">Inicio</a> / <b>Usuarios</b></div>
   <h1>Panel de usuarios</h1>

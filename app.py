@@ -200,15 +200,17 @@ def inicializar_db():
   ]
   for producto in productos_catalogo:
     if USAR_POSTGRES:
-      existe = cursor.execute(
+      cursor.execute(
         "SELECT 1 FROM productos WHERE LOWER(nombre) = LOWER(%s) LIMIT 1",
         (producto[0],),
-      ).fetchone()
+      )
+      existe = cursor.fetchone()
     else:
-      existe = cursor.execute(
+      cursor.execute(
         "SELECT 1 FROM productos WHERE nombre = ? COLLATE NOCASE LIMIT 1",
         (producto[0],),
-      ).fetchone()
+      )
+      existe = cursor.fetchone()
     if not existe:
       if USAR_POSTGRES:
         cursor.execute(

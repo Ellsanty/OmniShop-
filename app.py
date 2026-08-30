@@ -276,51 +276,57 @@ def carrito():
 @requiere_login
 def perfil():
   conexion = conectar_db()
-  usuario = conexion.execute(
-    "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios WHERE id = ?",
-    (session["usuario_id"],),
-  ).fetchone()
-  if usuario is None:
+  try:
+    with conexion.cursor() as cursor:
+      cursor.execute(
+        "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios WHERE id = %s" if USAR_POSTGRES else "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios WHERE id = ?",
+        (session["usuario_id"],),
+      )
+      usuario = cursor.fetchone()
+    if usuario is None:
+      conexion.close()
+      session.clear()
+      return redirect(url_for("login"))
+    error = None
+    mensaje = None
+    if request.method == "POST":
+      nombre = request.form.get("nombre", "").strip()
+      apellido = request.form.get("apellido", "").strip()
+      email = request.form.get("email", "").strip().lower()
+      telefono = request.form.get("telefono", "").strip()
+      nueva_password = request.form.get("password", "")
+      if not nombre or not apellido or not email:
+        error = "Nombre, apellido y correo son obligatorios."
+      elif nueva_password and len(nueva_password) < 6:
+        error = "La nueva contraseña debe tener al menos 6 caracteres."
+      else:
+        try:
+          with conexion.cursor() as cursor:
+            if USAR_POSTGRES:
+              cursor.execute(
+                "UPDATE usuarios SET nombre = %s, apellido = %s, email = %s, telefono = %s, correo = %s, password = %s, contrasena = %s, rol = CASE WHEN rol = 'admin' OR LOWER(%s) = LOWER(%s) THEN 'admin' ELSE rol END WHERE id = %s",
+                (nombre, apellido, email, telefono, email, generate_password_hash(nueva_password) if nueva_password else usuario["password"], generate_password_hash(nueva_password) if nueva_password else usuario["password"], email, ADMIN_EMAIL, session["usuario_id"]),
+              )
+            else:
+              cursor.execute(
+                "UPDATE usuarios SET nombre = ?, apellido = ?, email = ?, telefono = ?, correo = ?, password = ?, contrasena = ?, rol = CASE WHEN rol = 'admin' OR lower(?) = lower(?) THEN 'admin' ELSE rol END WHERE id = ?",
+                (nombre, apellido, email, telefono, email, generate_password_hash(nueva_password) if nueva_password else usuario["password"], generate_password_hash(nueva_password) if nueva_password else usuario["password"], email, ADMIN_EMAIL, session["usuario_id"]),
+              )
+            conexion.commit()
+            session["usuario_nombre"] = nombre
+            session["usuario_correo"] = email
+            mensaje = "Datos actualizados correctamente."
+            cursor.execute(
+              "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios WHERE id = %s" if USAR_POSTGRES else "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios WHERE id = ?",
+              (session["usuario_id"],),
+            )
+            usuario = cursor.fetchone()
+        except DB_INTEGRITY_ERROR:
+          conexion.rollback()
+          error = "Ese correo ya está registrado por otro usuario."
+    return render_template("perfil.html", usuario=usuario, error=error, mensaje=mensaje)
+  finally:
     conexion.close()
-    session.clear()
-    return redirect(url_for("login"))
-  error = None
-  mensaje = None
-  if request.method == "POST":
-    nombre = request.form.get("nombre", "").strip()
-    apellido = request.form.get("apellido", "").strip()
-    email = request.form.get("email", "").strip().lower()
-    telefono = request.form.get("telefono", "").strip()
-    nueva_password = request.form.get("password", "")
-    if not nombre or not apellido or not email:
-      error = "Nombre, apellido y correo son obligatorios."
-    elif nueva_password and len(nueva_password) < 6:
-      error = "La nueva contraseña debe tener al menos 6 caracteres."
-    else:
-      try:
-        if USAR_POSTGRES:
-          conexion.execute(
-            "UPDATE usuarios SET nombre = %s, apellido = %s, email = %s, telefono = %s, correo = %s, password = %s, contrasena = %s, rol = CASE WHEN rol = 'admin' OR LOWER(%s) = LOWER(%s) THEN 'admin' ELSE rol END WHERE id = %s",
-            (nombre, apellido, email, telefono, email, generate_password_hash(nueva_password) if nueva_password else usuario["password"], generate_password_hash(nueva_password) if nueva_password else usuario["password"], email, ADMIN_EMAIL, session["usuario_id"]),
-          )
-        else:
-          conexion.execute(
-            "UPDATE usuarios SET nombre = ?, apellido = ?, email = ?, telefono = ?, correo = ?, password = ?, contrasena = ?, rol = CASE WHEN rol = 'admin' OR lower(?) = lower(?) THEN 'admin' ELSE rol END WHERE id = ?",
-            (nombre, apellido, email, telefono, email, generate_password_hash(nueva_password) if nueva_password else usuario["password"], generate_password_hash(nueva_password) if nueva_password else usuario["password"], email, ADMIN_EMAIL, session["usuario_id"]),
-          )
-        conexion.commit()
-        session["usuario_nombre"] = nombre
-        session["usuario_correo"] = email
-        mensaje = "Datos actualizados correctamente."
-        usuario = conexion.execute(
-          "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios WHERE id = %s" if USAR_POSTGRES else "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios WHERE id = ?",
-          (session["usuario_id"],),
-        ).fetchone()
-      except DB_INTEGRITY_ERROR:
-        conexion.rollback()
-        error = "Ese correo ya está registrado por otro usuario."
-  conexion.close()
-  return render_template("perfil.html", usuario=usuario, error=error, mensaje=mensaje)
 
 
 @app.route("/api/checkout", methods=["POST"])
@@ -337,92 +343,98 @@ def checkout():
 
   conexion = conectar_db()
   try:
-    conexion.execute("BEGIN IMMEDIATE" if not USAR_POSTGRES else "BEGIN")
-    cantidades = {}
-    for item in raw_items:
-      cantidad = item.get("cantidad", item.get("qty"))
-      nombre = item.get("nombre")
-      try:
-        cantidad = int(cantidad)
-      except (TypeError, ValueError):
-        return jsonify({"error": "La cantidad de un producto no es válida."}), 400
-      if cantidad <= 0 or not nombre:
-        return jsonify({"error": "Cada producto debe tener nombre y cantidad positiva."}), 400
-      cantidades[nombre] = cantidades.get(nombre, 0) + cantidad
-
-    productos = []
-    for nombre, cantidad in cantidades.items():
-      if USAR_POSTGRES:
-        producto = conexion.execute(
-          "SELECT id, nombre, precio, stock FROM productos WHERE LOWER(nombre) = LOWER(%s) ORDER BY id LIMIT 1",
-          (nombre,),
-        ).fetchone()
+    with conexion.cursor() as cursor:
+      if not USAR_POSTGRES:
+        cursor.execute("BEGIN IMMEDIATE")
       else:
-        producto = conexion.execute(
-          "SELECT id, nombre, precio, stock FROM productos WHERE nombre = ? COLLATE NOCASE ORDER BY id LIMIT 1",
-          (nombre,),
-        ).fetchone()
-      if producto is None:
-        return jsonify({"error": f"El producto '{nombre}' no existe en el inventario."}), 404
-      if producto["stock"] < cantidad:
-        return jsonify({"error": f"Stock insuficiente para '{nombre}'. Disponible: {producto['stock']}."}), 409
-      productos.append((producto, cantidad))
+        cursor.execute("BEGIN")
+      cantidades = {}
+      for item in raw_items:
+        cantidad = item.get("cantidad", item.get("qty"))
+        nombre = item.get("nombre")
+        try:
+          cantidad = int(cantidad)
+        except (TypeError, ValueError):
+          return jsonify({"error": "La cantidad de un producto no es válida."}), 400
+        if cantidad <= 0 or not nombre:
+          return jsonify({"error": "Cada producto debe tener nombre y cantidad positiva."}), 400
+        cantidades[nombre] = cantidades.get(nombre, 0) + cantidad
 
-    subtotal = sum(producto["precio"] * cantidad for producto, cantidad in productos)
-    envio = 0 if subtotal >= 99 else 9.99
-    total = round(subtotal + envio, 2)
-    if USAR_POSTGRES:
-      cursor = conexion.execute(
-        "INSERT INTO pedidos (usuario_id, total, direccion) VALUES (%s, %s, %s) RETURNING id",
-        (session["usuario_id"], total, direccion),
-      )
-      pedido_id = cursor.fetchone()[0]
-    else:
-      cursor = conexion.execute(
-        "INSERT INTO pedidos (usuario_id, total, direccion) VALUES (?, ?, ?)",
-        (session["usuario_id"], total, direccion),
-      )
-      pedido_id = cursor.lastrowid
+      productos = []
+      for nombre, cantidad in cantidades.items():
+        if USAR_POSTGRES:
+          cursor.execute(
+            "SELECT id, nombre, precio, stock FROM productos WHERE LOWER(nombre) = LOWER(%s) ORDER BY id LIMIT 1",
+            (nombre,),
+          )
+          producto = cursor.fetchone()
+        else:
+          cursor.execute(
+            "SELECT id, nombre, precio, stock FROM productos WHERE nombre = ? COLLATE NOCASE ORDER BY id LIMIT 1",
+            (nombre,),
+          )
+          producto = cursor.fetchone()
+        if producto is None:
+          return jsonify({"error": f"El producto '{nombre}' no existe en el inventario."}), 404
+        if producto["stock"] < cantidad:
+          return jsonify({"error": f"Stock insuficiente para '{nombre}'. Disponible: {producto['stock']}."}), 409
+        productos.append((producto, cantidad))
 
-    for producto, cantidad in productos:
+      subtotal = sum(producto["precio"] * cantidad for producto, cantidad in productos)
+      envio = 0 if subtotal >= 99 else 9.99
+      total = round(subtotal + envio, 2)
       if USAR_POSTGRES:
-        conexion.execute(
-          "INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES (%s, %s, %s, %s)",
-          (pedido_id, producto["id"], cantidad, producto["precio"]),
+        cursor.execute(
+          "INSERT INTO pedidos (usuario_id, total, direccion) VALUES (%s, %s, %s) RETURNING id",
+          (session["usuario_id"], total, direccion),
         )
+        pedido_id = cursor.fetchone()["id"]
       else:
-        conexion.execute(
-          "INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)",
-          (pedido_id, producto["id"], cantidad, producto["precio"]),
+        cursor.execute(
+          "INSERT INTO pedidos (usuario_id, total, direccion) VALUES (?, ?, ?)",
+          (session["usuario_id"], total, direccion),
         )
-      if USAR_POSTGRES:
-        conexion.execute(
-          "UPDATE productos SET stock = stock - %s WHERE id = %s AND stock >= %s",
-          (cantidad, producto["id"], cantidad),
-        )
-      else:
-        conexion.execute(
-          "UPDATE productos SET stock = stock - ? WHERE id = ? AND stock >= ?",
-          (cantidad, producto["id"], cantidad),
-        )
+        pedido_id = cursor.lastrowid
 
-    conexion.commit()
-    usuario = session.get("usuario_correo") or session.get("usuario_id") or "invitado"
-    fecha_compra = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    detalle_venta = ", ".join(
-      f"{producto['nombre']} (cantidad: {cantidad})"
-      for producto, cantidad in productos
-    )
-    with open("ventas.txt", "a", encoding="utf-8") as archivo_ventas:
-      archivo_ventas.write(
-        f"Fecha: {fecha_compra}\n"
-        f"Usuario: {usuario}\n"
-        f"Productos: {detalle_venta}\n"
-        f"Dirección de entrega: {direccion}\n"
-        f"Total pagado: ${total:.2f}\n"
-        f"Pedido: #{pedido_id}\n"
-        "----------------------------------------\n"
+      for producto, cantidad in productos:
+        if USAR_POSTGRES:
+          cursor.execute(
+            "INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES (%s, %s, %s, %s)",
+            (pedido_id, producto["id"], cantidad, producto["precio"]),
+          )
+        else:
+          cursor.execute(
+            "INSERT INTO detalle_pedidos (pedido_id, producto_id, cantidad, precio_unitario) VALUES (?, ?, ?, ?)",
+            (pedido_id, producto["id"], cantidad, producto["precio"]),
+          )
+        if USAR_POSTGRES:
+          cursor.execute(
+            "UPDATE productos SET stock = stock - %s WHERE id = %s AND stock >= %s",
+            (cantidad, producto["id"], cantidad),
+          )
+        else:
+          cursor.execute(
+            "UPDATE productos SET stock = stock - ? WHERE id = ? AND stock >= ?",
+            (cantidad, producto["id"], cantidad),
+          )
+
+      conexion.commit()
+      usuario = session.get("usuario_correo") or session.get("usuario_id") or "invitado"
+      fecha_compra = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+      detalle_venta = ", ".join(
+        f"{producto['nombre']} (cantidad: {cantidad})"
+        for producto, cantidad in productos
       )
+      with open("ventas.txt", "a", encoding="utf-8") as archivo_ventas:
+        archivo_ventas.write(
+          f"Fecha: {fecha_compra}\n"
+          f"Usuario: {usuario}\n"
+          f"Productos: {detalle_venta}\n"
+          f"Dirección de entrega: {direccion}\n"
+          f"Total pagado: ${total:.2f}\n"
+          f"Pedido: #{pedido_id}\n"
+          "----------------------------------------\n"
+        )
     return jsonify({"pedido_id": pedido_id, "total": total}), 201
   except DB_ERROR:
     conexion.rollback()
@@ -436,22 +448,47 @@ def mis_pedidos():
   if "usuario_id" not in session:
     return render_template("mis_pedidos.html", pedidos=[], detalles={}, requiere_login=True)
   conexion = conectar_db()
-  pedidos = conexion.execute(
-    "SELECT id, fecha, total, direccion, estado FROM pedidos WHERE usuario_id = ? ORDER BY fecha DESC, id DESC",
-    (session["usuario_id"],),
-  ).fetchall()
-  detalles = conexion.execute(
-    """
-    SELECT d.pedido_id, p.nombre, d.cantidad, d.precio_unitario
-    FROM detalle_pedidos d
-    JOIN pedidos pe ON pe.id = d.pedido_id
-    JOIN productos p ON p.id = d.producto_id
-    WHERE pe.usuario_id = ?
-    ORDER BY d.id
-    """,
-    (session["usuario_id"],),
-  ).fetchall()
-  conexion.close()
+  try:
+    with conexion.cursor() as cursor:
+      if USAR_POSTGRES:
+        cursor.execute(
+          "SELECT id, fecha, total, direccion, estado FROM pedidos WHERE usuario_id = %s ORDER BY fecha DESC, id DESC",
+          (session["usuario_id"],),
+        )
+      else:
+        cursor.execute(
+          "SELECT id, fecha, total, direccion, estado FROM pedidos WHERE usuario_id = ? ORDER BY fecha DESC, id DESC",
+          (session["usuario_id"],),
+        )
+      pedidos = cursor.fetchall()
+
+      if USAR_POSTGRES:
+        cursor.execute(
+          """
+          SELECT d.pedido_id, p.nombre, d.cantidad, d.precio_unitario
+          FROM detalle_pedidos d
+          JOIN pedidos pe ON pe.id = d.pedido_id
+          JOIN productos p ON p.id = d.producto_id
+          WHERE pe.usuario_id = %s
+          ORDER BY d.id
+          """,
+          (session["usuario_id"],),
+        )
+      else:
+        cursor.execute(
+          """
+          SELECT d.pedido_id, p.nombre, d.cantidad, d.precio_unitario
+          FROM detalle_pedidos d
+          JOIN pedidos pe ON pe.id = d.pedido_id
+          JOIN productos p ON p.id = d.producto_id
+          WHERE pe.usuario_id = ?
+          ORDER BY d.id
+          """,
+          (session["usuario_id"],),
+        )
+      detalles = cursor.fetchall()
+  finally:
+    conexion.close()
   detalles_por_pedido = {}
   for detalle in detalles:
     detalles_por_pedido.setdefault(detalle["pedido_id"], []).append(detalle)
@@ -462,69 +499,75 @@ def mis_pedidos():
 @requiere_admin
 def inventario():
   conexion = conectar_db()
-  producto_id = request.form.get("producto_id", type=int)
-  if request.method == "POST":
-    delta = request.form.get("delta", type=int)
-    stock = request.form.get("stock", type=int)
-    if producto_id is None or (delta is None and (stock is None or stock < 0)):
-      conexion.close()
-      return "El producto y el stock deben ser válidos.", 400
-    if delta is not None:
-      if USAR_POSTGRES:
-        conexion.execute(
-          "UPDATE productos SET stock = GREATEST(0, stock + %s) WHERE id = %s",
-          (delta, producto_id),
-        )
-      else:
-        conexion.execute(
-          "UPDATE productos SET stock = MAX(0, stock + ?) WHERE id = ?",
-          (delta, producto_id),
-        )
-    else:
-      if USAR_POSTGRES:
-        conexion.execute("UPDATE productos SET stock = %s WHERE id = %s", (stock, producto_id))
-      else:
-        conexion.execute("UPDATE productos SET stock = ? WHERE id = ?", (stock, producto_id))
-    conexion.commit()
-  productos = conexion.execute("SELECT id, nombre, precio, stock FROM productos ORDER BY nombre").fetchall()
-  conexion.close()
-  return render_template("inventario.html", productos=productos)
+  try:
+    with conexion.cursor() as cursor:
+      producto_id = request.form.get("producto_id", type=int)
+      if request.method == "POST":
+        delta = request.form.get("delta", type=int)
+        stock = request.form.get("stock", type=int)
+        if producto_id is None or (delta is None and (stock is None or stock < 0)):
+          return "El producto y el stock deben ser válidos.", 400
+        if delta is not None:
+          if USAR_POSTGRES:
+            cursor.execute(
+              "UPDATE productos SET stock = GREATEST(0, stock + %s) WHERE id = %s",
+              (delta, producto_id),
+            )
+          else:
+            cursor.execute(
+              "UPDATE productos SET stock = MAX(0, stock + ?) WHERE id = ?",
+              (delta, producto_id),
+            )
+        else:
+          if USAR_POSTGRES:
+            cursor.execute("UPDATE productos SET stock = %s WHERE id = %s", (stock, producto_id))
+          else:
+            cursor.execute("UPDATE productos SET stock = ? WHERE id = ?", (stock, producto_id))
+        conexion.commit()
+      cursor.execute("SELECT id, nombre, precio, stock FROM productos ORDER BY nombre")
+      productos = cursor.fetchall()
+    return render_template("inventario.html", productos=productos)
+  finally:
+    conexion.close()
 
 
 @app.route("/admin/usuarios", methods=["GET", "POST"])
 @requiere_admin
 def admin_usuarios():
   conexion = conectar_db()
-  if request.method == "POST":
-    usuario_id = request.form.get("usuario_id", type=int)
-    if usuario_id == session["usuario_id"]:
-      conexion.close()
-      return "No puedes eliminar tu propia cuenta de administrador.", 400
-    try:
-      if USAR_POSTGRES:
-        conexion.execute(
-          "DELETE FROM detalle_pedidos WHERE pedido_id IN (SELECT id FROM pedidos WHERE usuario_id = %s)",
-          (usuario_id,),
-        )
-        conexion.execute("DELETE FROM pedidos WHERE usuario_id = %s", (usuario_id,))
-        conexion.execute("DELETE FROM usuarios WHERE id = %s", (usuario_id,))
-      else:
-        conexion.execute(
-          "DELETE FROM detalle_pedidos WHERE pedido_id IN (SELECT id FROM pedidos WHERE usuario_id = ?)",
-          (usuario_id,),
-        )
-        conexion.execute("DELETE FROM pedidos WHERE usuario_id = ?", (usuario_id,))
-        conexion.execute("DELETE FROM usuarios WHERE id = ?", (usuario_id,))
-      conexion.commit()
-    except DB_ERROR:
-      conexion.rollback()
-      conexion.close()
-      return "No fue posible eliminar el usuario.", 500
-  usuarios = conexion.execute(
-    "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios ORDER BY id"
-  ).fetchall()
-  conexion.close()
-  return render_template("admin_usuarios.html", usuarios=usuarios)
+  try:
+    if request.method == "POST":
+      usuario_id = request.form.get("usuario_id", type=int)
+      if usuario_id == session["usuario_id"]:
+        return "No puedes eliminar tu propia cuenta de administrador.", 400
+      try:
+        with conexion.cursor() as cursor:
+          if USAR_POSTGRES:
+            cursor.execute(
+              "DELETE FROM detalle_pedidos WHERE pedido_id IN (SELECT id FROM pedidos WHERE usuario_id = %s)",
+              (usuario_id,),
+            )
+            cursor.execute("DELETE FROM pedidos WHERE usuario_id = %s", (usuario_id,))
+            cursor.execute("DELETE FROM usuarios WHERE id = %s", (usuario_id,))
+          else:
+            cursor.execute(
+              "DELETE FROM detalle_pedidos WHERE pedido_id IN (SELECT id FROM pedidos WHERE usuario_id = ?)",
+              (usuario_id,),
+            )
+            cursor.execute("DELETE FROM pedidos WHERE usuario_id = ?", (usuario_id,))
+            cursor.execute("DELETE FROM usuarios WHERE id = ?", (usuario_id,))
+          conexion.commit()
+      except DB_ERROR:
+        conexion.rollback()
+        return "No fue posible eliminar el usuario.", 500
+    with conexion.cursor() as cursor:
+      cursor.execute(
+        "SELECT id, nombre, apellido, email, telefono, rol FROM usuarios ORDER BY id"
+      )
+      usuarios = cursor.fetchall()
+    return render_template("admin_usuarios.html", usuarios=usuarios)
+  finally:
+    conexion.close()
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -534,11 +577,15 @@ def login():
   correo = request.form.get("email", request.form.get("correo", "")).strip().lower()
   contrasena = request.form.get("password", request.form.get("contrasena", ""))
   conexion = conectar_db()
-  if USAR_POSTGRES:
-    usuario = conexion.execute("SELECT * FROM usuarios WHERE LOWER(email) = LOWER(%s)", (correo,)).fetchone()
-  else:
-    usuario = conexion.execute("SELECT * FROM usuarios WHERE email = ? COLLATE NOCASE", (correo,)).fetchone()
-  conexion.close()
+  try:
+    with conexion.cursor() as cursor:
+      if USAR_POSTGRES:
+        cursor.execute("SELECT * FROM usuarios WHERE LOWER(email) = LOWER(%s)", (correo,))
+      else:
+        cursor.execute("SELECT * FROM usuarios WHERE email = ? COLLATE NOCASE", (correo,))
+      usuario = cursor.fetchone()
+  finally:
+    conexion.close()
   if not usuario or not check_password_hash(usuario["password"], contrasena):
     return render_template("login.html", error="Correo o contraseña incorrectos.", next_url=request.form.get("next", "/")), 401
   session["usuario_id"] = usuario["id"]
@@ -547,12 +594,15 @@ def login():
   rol = "admin" if correo == ADMIN_EMAIL else usuario["rol"]
   if rol == "admin" and usuario["rol"] != "admin":
     conexion = conectar_db()
-    if USAR_POSTGRES:
-      conexion.execute("UPDATE usuarios SET rol = 'admin' WHERE id = %s", (usuario["id"],))
-    else:
-      conexion.execute("UPDATE usuarios SET rol = 'admin' WHERE id = ?", (usuario["id"],))
-    conexion.commit()
-    conexion.close()
+    try:
+      with conexion.cursor() as cursor:
+        if USAR_POSTGRES:
+          cursor.execute("UPDATE usuarios SET rol = 'admin' WHERE id = %s", (usuario["id"],))
+        else:
+          cursor.execute("UPDATE usuarios SET rol = 'admin' WHERE id = ?", (usuario["id"],))
+        conexion.commit()
+    finally:
+      conexion.close()
   session["usuario_rol"] = rol
   return redirect(request.form.get("next") or url_for("index"))
 
@@ -578,23 +628,29 @@ def registro():
 
   try:
     conexion = conectar_db()
-    cantidad_usuarios = conexion.execute("SELECT COUNT(*) FROM usuarios").fetchone()[0]
-    rol = "admin" if cantidad_usuarios == 0 or correo == ADMIN_EMAIL else "cliente"
-    if USAR_POSTGRES:
-      conexion.execute(
-        "INSERT INTO usuarios (nombre, apellido, email, password, telefono, rol, correo, contrasena) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
-        (nombre, apellido, correo, generate_password_hash(contrasena), telefono, rol, correo, generate_password_hash(contrasena)),
-      )
-    else:
-      conexion.execute(
-        "INSERT INTO usuarios (nombre, apellido, email, password, telefono, rol, correo, contrasena) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        (nombre, apellido, correo, generate_password_hash(contrasena), telefono, rol, correo, generate_password_hash(contrasena)),
-      )
-    conexion.commit()
+    try:
+      with conexion.cursor() as cursor:
+        cursor.execute("SELECT COUNT(*) FROM usuarios")
+        resultado = cursor.fetchone()
+        cantidad_usuarios = resultado[0] if not isinstance(resultado, dict) else resultado.get("count")
+        rol = "admin" if cantidad_usuarios == 0 or correo == ADMIN_EMAIL else "cliente"
+        if USAR_POSTGRES:
+          cursor.execute(
+            "INSERT INTO usuarios (nombre, apellido, email, password, telefono, rol, correo, contrasena) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+            (nombre, apellido, correo, generate_password_hash(contrasena), telefono, rol, correo, generate_password_hash(contrasena)),
+          )
+        else:
+          cursor.execute(
+            "INSERT INTO usuarios (nombre, apellido, email, password, telefono, rol, correo, contrasena) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            (nombre, apellido, correo, generate_password_hash(contrasena), telefono, rol, correo, generate_password_hash(contrasena)),
+          )
+        conexion.commit()
+      return redirect(url_for("login", next=request.form.get("next", "/")))
+    except DB_INTEGRITY_ERROR:
+      conexion.rollback()
+      return render_template("registro.html", error="Ese correo ya está registrado.", next_url=request.form.get("next", "/")), 409
+  finally:
     conexion.close()
-    return redirect(url_for("login", next=request.form.get("next", "/")))
-  except DB_INTEGRITY_ERROR:
-    return render_template("registro.html", error="Ese correo ya está registrado.", next_url=request.form.get("next", "/")), 409
 
 
 if __name__ == "__main__":

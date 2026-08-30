@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniShop | Inventario</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header><div class="wrap hbar">
+  <a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a>
+  <nav class="links"><a href="{{ url_for('index') }}">Catálogo</a><a href="{{ url_for('mis_pedidos') }}">Mis pedidos</a><a href="{{ url_for('inventario') }}">Inventario</a><a href="{{ url_for('admin_usuarios') }}">Usuarios</a></nav>
+  <a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a><form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form>
+</div></header>
+<main class="wrap inventory-page">
+  <div class="crumbs"><a href="{{ url_for('index') }}">Inicio</a> / <b>Inventario</b></div>
+  <h1>Panel de inventario</h1>
+  <p class="page-note">Actualiza las unidades disponibles. Los cambios se aplican al siguiente pedido.</p>
+  <div class="inventory-table">
+    <div class="inventory-row inventory-title"><span>Producto</span><span>Precio</span><span>Stock actual</span><span>Acción</span></div>
+    {% for producto in productos %}
+      <form class="inventory-row" method="post">
+        <input type="hidden" name="producto_id" value="{{ producto.id }}">
+        <span>{{ producto.nombre }}</span>
+        <span>${{ '%.2f'|format(producto.precio) }}</span>
+        <label class="stock-editor"><button class="stock-step" type="submit" name="delta" value="-1" aria-label="Disminuir stock de {{ producto.nombre }}">−</button><span class="sr-only">Stock de {{ producto.nombre }}</span><input type="number" name="stock" min="0" value="{{ producto.stock }}" required><button class="stock-step" type="submit" name="delta" value="1" aria-label="Aumentar stock de {{ producto.nombre }}">+</button></label>
+        <button class="btn btn-grad" type="submit">Actualizar</button>
+      </form>
+    {% else %}
+      <div class="notice">No hay productos en el inventario.</div>
+    {% endfor %}
+  </div>
+</main>
+</body>
+</html>

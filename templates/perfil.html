@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniShop | Mi cuenta</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<main class="auth-page"><section class="auth-box">
+  <a class="profile-back" href="{{ url_for('index') }}" aria-label="Volver a la tienda">← Volver a la tienda</a>
+  <a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a><h1>Mi cuenta</h1>
+  {% if error %}<div class="notice error-notice">{{ error }}</div>{% endif %}{% if mensaje %}<div class="notice success-notice">{{ mensaje }}</div>{% endif %}
+  <form method="post" class="auth-form" id="perfil-form">
+    <label for="nombre">Nombre</label><input id="nombre" name="nombre" value="{{ usuario.nombre }}" required>
+    <label for="apellido">Apellido</label><input id="apellido" name="apellido" value="{{ usuario.apellido }}" required>
+    <label for="email">Correo electrónico</label><input id="email" name="email" type="email" value="{{ usuario.email }}" required>
+    <label for="telefono">Teléfono</label><input id="telefono" name="telefono" value="{{ usuario.telefono }}">
+    <label for="password">Nueva contraseña <span class="muted-label">(opcional)</span></label><input id="password" name="password" type="password" minlength="6" autocomplete="new-password">
+    <button class="checkout" id="guardar-cambios" type="submit" disabled>Guardar cambios</button>
+  </form>
+  <p class="auth-switch"><a href="{{ url_for('index') }}">Volver a la tienda</a> · {% if usuario.rol == 'admin' %}<a href="{{ url_for('admin_usuarios') }}">Panel de usuarios</a>{% endif %}</p>
+</section></main>
+<script>
+  const perfilForm = document.getElementById('perfil-form');
+  const guardarCambios = document.getElementById('guardar-cambios');
+  const camposPerfil = perfilForm.querySelectorAll('input:not([type="hidden"])');
+  const valoresIniciales = Array.from(camposPerfil, campo => campo.value);
+
+  camposPerfil.forEach(campo => campo.addEventListener('input', () => {
+    const hayCambios = Array.from(camposPerfil, campo => campo.value).some((valor, indice) => valor !== valoresIniciales[indice]);
+    guardarCambios.disabled = !hayCambios;
+  }));
+</script>
+</body>
+</html>

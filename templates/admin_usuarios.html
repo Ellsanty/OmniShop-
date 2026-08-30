@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniShop | Usuarios</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header><div class="wrap hbar"><a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a><nav class="links"><a href="{{ url_for('index') }}">Catálogo</a><a href="{{ url_for('inventario') }}">Inventario</a><a href="{{ url_for('admin_usuarios') }}">Usuarios</a></nav><a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a><form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form></div></header>
+<main class="wrap inventory-page">
+  <div class="crumbs"><a href="{{ url_for('index') }}">Inicio</a> / <b>Usuarios</b></div>
+  <h1>Panel de usuarios</h1>
+  <div class="inventory-table">
+    <div class="inventory-row user-title"><span>ID</span><span>Nombre</span><span>Correo</span><span>Teléfono</span><span>Acción</span></div>
+    {% for usuario in usuarios %}
+      <div class="inventory-row user-row"><span>#{{ usuario.id }}</span><span>{{ usuario.nombre }} {{ usuario.apellido }} <small>{{ usuario.rol }}</small></span><span>{{ usuario.email }}</span><span>{{ usuario.telefono or 'No indicado' }}</span><span>{% if usuario.id != session.get('usuario_id') %}<form method="post" onsubmit="return confirm('¿Eliminar esta cuenta de prueba?');"><input type="hidden" name="usuario_id" value="{{ usuario.id }}"><button class="btn btn-danger" type="submit">Eliminar</button></form>{% else %}<span class="muted-label">Cuenta actual</span>{% endif %}</span></div>
+    {% else %}<div class="notice">No hay usuarios registrados.</div>{% endfor %}
+  </div>
+</main>
+</body>
+</html>

@@ -5,20 +5,24 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="OmniShop — Tu carrito de compras: revisa lo pendiente, cambia cantidades y finaliza tu pedido.">
 <title>OmniShop ▮ Tu carrito</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
 <header>
   <div class="wrap hbar">
-    <a class="logo" href="index.html">OmniShop<b>▮</b></a>
+    <a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a>
     <nav class="links">
-      <a href="index.html#catalogo">Catálogo</a>
-      <a href="index.html#catalogo">GPUs</a>
-      <a href="index.html#catalogo">Portátiles</a>
-      <a href="index.html#catalogo">Monitores</a>
+      <a href="{{ url_for('index') }}#catalogo">Catálogo</a>
+      <a href="{{ url_for('index') }}#catalogo">GPUs</a>
+      <a href="{{ url_for('index') }}#catalogo">Portátiles</a>
+      <a href="{{ url_for('index') }}#catalogo">Monitores</a>
+      <a href="{{ url_for('mis_pedidos') }}">Mis pedidos</a>
     </nav>
-    <a class="cart-btn" href="carrito.html" aria-label="Ir al carrito">🛒 Carrito <span class="cnt hide" id="cart-cnt">0</span></a>
+    <a class="cart-btn" href="{{ url_for('carrito') }}" aria-label="Ir al carrito">🛒 Carrito <span class="cnt hide" id="cart-cnt">0</span></a>
+    <a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a>
+    {% if session.get('usuario_rol') == 'admin' %}<a class="btn btn-ghost" href="{{ url_for('inventario') }}">Inventario</a><a class="btn btn-ghost" href="{{ url_for('admin_usuarios') }}">Usuarios</a>{% endif %}
+    <form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form>
   </div>
 </header>
 
@@ -36,7 +40,7 @@
   <div class="wrap">
     <div class="fcols">
       <div>
-        <a class="logo" href="index.html" style="font-size:18px">OmniShop<b>▮</b></a>
+        <a class="logo" href="{{ url_for('index') }}" style="font-size:18px">OmniShop<b>▮</b></a>
         <p style="color:var(--mut);font-size:12.5px;margin-top:8px;max-width:220px">La tienda de tecnología con estética del futuro. Precios reales, fichas técnicas y envío rápido.</p>
       </div>
       <div><h4>Categorías</h4><ul><li>GPUs y tarjetas gráficas</li><li>Procesadores</li><li>Portátiles</li><li>Monitores</li><li>Periféricos</li></ul></div>
@@ -55,12 +59,25 @@
     <h3 style="font-size:19px">¡Pedido registrado!</h3>
     <p id="ok-info" style="color:var(--mut);font-size:13px;margin-top:8px;line-height:1.6"></p>
     <button class="checkout" id="ok-btn" style="margin-top:16px">Seguir comprando</button>
-    <p class="note">El <b>login</b> y el <b>pago en línea</b> llegan en la siguiente fase del proyecto — por ahora todo se guarda en tu navegador.</p>
+    <p class="note">Tu pedido queda asociado a tu cuenta y a la dirección indicada.</p>
+  </div>
+</div>
+
+<div class="modal" id="modal-checkout" role="dialog" aria-modal="true">
+  <div class="box" style="max-width:440px">
+    <button class="close-m" id="checkout-cerrar" aria-label="Cerrar">✕</button>
+    <h3>Dirección de entrega</h3>
+    <p class="note">Indica dónde deseas recibir tu pedido.</p>
+    <form id="checkout-form" class="auth-form">
+      <label for="direccion">Dirección completa</label>
+      <textarea id="direccion" name="direccion" rows="3" minlength="8" required placeholder="Calle, número, ciudad"></textarea>
+      <button class="checkout" type="submit">Confirmar pedido</button>
+    </form>
   </div>
 </div>
 
 <div class="toasts" id="toasts"></div>
 
-<script src="script.js"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

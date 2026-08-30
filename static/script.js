@@ -1,11 +1,13 @@
 ﻿/* =========================================================
    OmniShop — prototipo v0.1 · script.js
-   Funciona en dos páginas: index.html (catálogo)
-   y carrito.html (página propia del carrito).
+  Funciona en las páginas del catálogo y del carrito.
    ========================================================= */
 const MONEDA = '$';
 const ENVIO_GRATIS = 99;
 const ENVIO = 9.99;
+const STATIC_PREFIX = document.querySelector('script[src*="/static/"]') ? '/static/' : '';
+const HOME_URL = '/';
+const INVENTARIO = window.INVENTARIO || [];
 
 const PRODUCTOS = [
   { id: 'gpu-5070ti', nombre: 'RTX 5070 Ti 16GB', marca: 'NVIDIA', cat: 'GPUs', precio: 899, antes: 1049, rating: 4.8, stock: 14, dest: true, specs: ['Memoria', '16 GB GDDR7', 'Chip', 'Blackwell · 8,960 núcleos CUDA', 'Boost', '2,850 MHz', 'Consumo', '300 W', 'Extras', 'DLSS 4 + Ray Tracing', 'Conector', 'PCIe 5.0 · 16 pines'], art: 'gpu', image: 'img/GeForce-RTX™-5070-Ti-WINDFORCE-OC-SFF-16G-01.png' },
@@ -53,7 +55,7 @@ function svgArt(kind, seed) {
 
 function productArt(product) {
   return product.image
-    ? `<img class="product-image" src="${product.image}" alt="${product.nombre}" loading="lazy">`
+    ? `<img class="product-image" src="${STATIC_PREFIX}${product.image}" alt="${product.nombre}" loading="lazy">`
     : svgArt(product.art, product.id);
 }
 
@@ -62,6 +64,11 @@ const state = {
   orden: 'reco',
   query: ''
 };
+
+function stockDisponible(product) {
+  const registro = INVENTARIO.find(item => item.nombre.toLowerCase() === product.nombre.toLowerCase());
+  return registro ? Number(registro.stock) : 0;
+}
 
 function readCart() {
   try {
@@ -135,8 +142,9 @@ function renderChips() {
 }
 
 function getStockLabel(product) {
-  if (product.stock <= 0) return '<span class="stock out">Sin stock</span>';
-  if (product.stock <= 8) return '<span class="stock low">Últimas unidades</span>';
+  const stock = stockDisponible(product);
+  if (stock <= 0) return '<span class="stock out">Sin stock</span>';
+  if (stock <= 8) return '<span class="stock low">Últimas unidades</span>';
   return '<span class="stock">En stock</span>';
 }
 
@@ -159,7 +167,7 @@ function renderCatalog() {
       </div>
       <div class="brand">${p.marca}</div>
       <h3>${p.nombre}</h3>
-      <div class="rate">★ ${p.rating} <span>(${p.stock} disponibles)</span></div>
+      <div class="rate">★ ${p.rating} <span>(${stockDisponible(p)} disponibles)</span></div>
       <div class="specs-mini">${p.specs.slice(0, 4).join(' · ')}</div>
       <div class="prow">
         <div class="price"><b>${fmt(p.precio)}</b></div>
@@ -183,7 +191,8 @@ function openModal(productId) {
   const product = PRODUCTOS.find(p => p.id === productId);
   if (!product) return;
 
-  let selectedQty = 1;
+  const stock = stockDisponible(product);
+  let selectedQty = stock > 0 ? 1 : 0;
   box.innerHTML = `
     <button class="close-m" aria-label="Cerrar" data-close="modal">✕</button>
     <div class="big">
@@ -191,7 +200,7 @@ function openModal(productId) {
       <div class="meta">
         <div class="brand">${product.marca}</div>
         <h3>${product.nombre}</h3>
-        <div class="rate">★ ${product.rating} <span>(${product.stock} en stock)</span></div>
+        <div class="rate">★ ${product.rating} <span>(${stock} en stock)</span></div>
         <div class="m-price"><b>${fmt(product.precio)}</b></div>
         <div class="buyrow">
           <div class="qty">
@@ -199,7 +208,7 @@ function openModal(productId) {
             <span id="modal-qty">${selectedQty}</span>
             <button type="button" data-qty="up" data-product="${product.id}">+</button>
           </div>
-          <button class="checkout" data-add-modal="${product.id}" data-qty="${selectedQty}">Añadir al carrito</button>
+          <button class="checkout" data-add-modal="${product.id}" data-qty="${selectedQty}" ${stock <= 0 ? 'disabled' : ''}>Añadir al carrito</button>
         </div>
         <p class="note">${product.dest ? 'Producto destacado • ' : ''}Envío ${product.precio >= ENVIO_GRATIS ? 'gratis' : 'desde ' + fmt(ENVIO)}.</p>
       </div>
@@ -218,7 +227,7 @@ function openModal(productId) {
   document.querySelectorAll('[data-qty]').forEach(btn => {
     btn.addEventListener('click', () => {
       const action = btn.dataset.qty;
-      selectedQty = Math.max(1, Math.min(product.stock || 1, action === 'up' ? selectedQty + 1 : selectedQty - 1));
+      selectedQty = Math.max(1, Math.min(stock || 1, action === 'up' ? selectedQty + 1 : selectedQty - 1));
       qtyDisplay.textContent = selectedQty;
       addButton.dataset.qty = String(selectedQty);
     });
@@ -286,7 +295,7 @@ function renderCart() {
         <div class="big">🛒</div>
         <b>Tu carrito está vacío</b><br>
         Explora el catálogo y añade productos para comenzar tu compra.
-        <div><a class="cont-link" href="index.html">Continuar comprando</a></div>
+        <div><a class="cont-link" href="${HOME_URL}">Continuar comprando</a></div>
       </div>
     `;
     summary.innerHTML = `
@@ -295,7 +304,7 @@ function renderCart() {
       <div class="row"><span>Envío</span><span>${fmt(0)}</span></div>
       <div class="row total"><span>Total</span><b>${fmt(0)}</b></div>
       <button class="checkout" disabled>Finalizar compra</button>
-      <button class="btn-sec" onclick="location.href='index.html'">Seguir comprando</button>
+      <button class="btn-sec" onclick="location.href='${HOME_URL}'">Seguir comprando</button>
     `;
     return;
   }
@@ -341,7 +350,7 @@ function renderCart() {
     <div class="row"><span>Envío</span><span>${envio === 0 ? 'Gratis' : fmt(envio)}</span></div>
     <div class="row total"><span>Total</span><b>${fmt(total)}</b></div>
     <button class="checkout" id="checkout-btn">Finalizar compra</button>
-    <button class="btn-sec" onclick="location.href='index.html'">Seguir comprando</button>
+    <button class="btn-sec" onclick="location.href='/'">Seguir comprando</button>
   `;
 
   document.querySelectorAll('[data-remove]').forEach(btn => {
@@ -358,13 +367,8 @@ function renderCart() {
   const checkoutBtn = document.getElementById('checkout-btn');
   if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
-      const modal = document.getElementById('modal-ok');
-      if (!modal) return;
-      const info = document.getElementById('ok-info');
-      if (info) {
-        info.textContent = `Has pedido ${items.reduce((sum, item) => sum + item.qty, 0)} artículo(s) por ${fmt(total)}. Te avisaremos cuando el pedido esté preparado.`;
-      }
-      modal.classList.add('show');
+      document.getElementById('modal-checkout')?.classList.add('show');
+      document.getElementById('direccion')?.focus();
     });
   }
 }
@@ -418,7 +422,55 @@ function bindCatalogEvents() {
       saveCart([]);
       updateCartBadge();
       renderCart();
-      window.location.href = 'index.html';
+      window.location.href = '/';
+    });
+  }
+
+  const checkoutModal = document.getElementById('modal-checkout');
+  const checkoutForm = document.getElementById('checkout-form');
+  const checkoutClose = document.getElementById('checkout-cerrar');
+  if (checkoutClose) checkoutClose.addEventListener('click', () => checkoutModal?.classList.remove('show'));
+  if (checkoutModal) {
+    checkoutModal.addEventListener('click', event => {
+      if (event.target === checkoutModal) checkoutModal.classList.remove('show');
+    });
+  }
+  if (checkoutForm) {
+    checkoutForm.addEventListener('submit', async event => {
+      event.preventDefault();
+      const submitButton = checkoutForm.querySelector('button[type="submit"]');
+      const items = readCart().map(entry => {
+        const product = PRODUCTOS.find(item => item.id === entry.id);
+        return product ? { nombre: product.nombre, cantidad: entry.qty } : null;
+      }).filter(Boolean);
+      submitButton.disabled = true;
+      submitButton.textContent = 'Registrando pedido...';
+      try {
+        const response = await fetch('/api/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ items, direccion: checkoutForm.direccion.value.trim() })
+        });
+        const result = await response.json();
+        if (response.status === 401 && result.login_url) {
+          window.location.href = result.login_url;
+          return;
+        }
+        if (!response.ok) throw new Error(result.error || 'No fue posible registrar el pedido.');
+        checkoutModal?.classList.remove('show');
+        saveCart([]);
+        updateCartBadge();
+        renderCart();
+        const modal = document.getElementById('modal-ok');
+        const info = document.getElementById('ok-info');
+        if (info) info.textContent = `Pedido #${result.pedido_id}: compra registrada por ${fmt(result.total)}. Te avisaremos cuando esté preparado.`;
+        modal?.classList.add('show');
+      } catch (error) {
+        showToast(error.message, true);
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = 'Confirmar pedido';
+      }
     });
   }
 
@@ -426,13 +478,17 @@ function bindCatalogEvents() {
     if (event.key === 'Escape') {
       const modalEl = document.getElementById('modal');
       const okModalEl = document.getElementById('modal-ok');
+      const checkoutModalEl = document.getElementById('modal-checkout');
       if (modalEl) modalEl.classList.remove('show');
       if (okModalEl) okModalEl.classList.remove('show');
+      if (checkoutModalEl) checkoutModalEl.classList.remove('show');
     }
   });
 
   const btnCatalog = document.getElementById('go-catalogo');
   const btnOfertas = document.getElementById('go-ofertas');
+  const btnLogin = document.getElementById('btn-login');
+  if (btnLogin) btnLogin.addEventListener('click', () => { window.location.href = '/login'; });
   if (btnCatalog) btnCatalog.addEventListener('click', () => document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth' }));
   if (btnOfertas) btnOfertas.addEventListener('click', () => {
     state.categoria = 'GPUs';

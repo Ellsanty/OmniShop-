@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OmniShop | Mis pedidos</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header><div class="wrap hbar">
+  <a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a>
+  <nav class="links"><a href="{{ url_for('index') }}">Catálogo</a><a href="{{ url_for('carrito') }}">Carrito</a><a href="{{ url_for('mis_pedidos') }}">Mis pedidos</a></nav>
+  {% if session.get('usuario_id') %}<a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a><form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form>{% endif %}
+</div></header>
+<main class="wrap orders-page">
+  <div class="crumbs"><a href="{{ url_for('index') }}">Inicio</a> / <b>Mis pedidos</b></div>
+  <h1>Historial de pedidos</h1>
+  {% if requiere_login %}
+    <div class="notice">Inicia sesión para consultar tus pedidos.</div>
+  {% elif not pedidos %}
+    <div class="notice">Todavía no tienes pedidos registrados.</div>
+  {% else %}
+    {% for pedido in pedidos %}
+      <section class="order-card">
+        <div class="order-head"><b>Pedido #{{ pedido.id }}</b><span>{{ pedido.fecha }} · {{ pedido.estado }} · {{ pedido.direccion }}</span><strong>${{ '%.2f'|format(pedido.total) }}</strong></div>
+        <ul class="order-lines">
+          {% for detalle in detalles.get(pedido.id, []) %}
+            <li><span>{{ detalle.nombre }}</span><span>{{ detalle.cantidad }} x ${{ '%.2f'|format(detalle.precio_unitario) }}</span></li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+  {% endif %}
+</main>
+</body>
+</html>

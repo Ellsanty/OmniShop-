@@ -5,25 +5,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="OmniShop — Tienda de tecnología futurista: componentes, portátiles, monitores y periféricos. Precios reales, fichas técnicas y carrito sin registro.">
 <title>OmniShop ▮ Tecnología del futuro, hoy</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
 
 <header>
   <div class="wrap hbar">
-    <a class="logo" href="index.html">OmniShop<b>▮</b></a>
+    <a class="logo" href="{{ url_for('index') }}">OmniShop<b>▮</b></a>
     <nav class="links">
       <a href="#catalogo">Catálogo</a>
       <a href="#catalogo" data-jump="GPUs">GPUs</a>
       <a href="#catalogo" data-jump="Portátiles">Portátiles</a>
       <a href="#catalogo" data-jump="Monitores">Monitores</a>
+      <a href="{{ url_for('mis_pedidos') }}">Mis pedidos</a>
     </nav>
     <div class="search">
       <span>🔍</span>
       <input id="buscador" type="text" placeholder="Busca GPU, procesador, monitor…" aria-label="Buscar productos">
     </div>
-    <button class="btn btn-ghost" id="btn-login">Entrar</button>
-    <a class="cart-btn" href="carrito.html" aria-label="Ir al carrito">🛒 Carrito <span class="cnt hide" id="cart-cnt">0</span></a>
+    {% if session.get('usuario_id') %}
+      <a class="btn btn-ghost" href="{{ url_for('perfil') }}">Mi cuenta</a>
+      {% if session.get('usuario_rol') == 'admin' %}<a class="btn btn-ghost" href="{{ url_for('inventario') }}">Inventario</a><a class="btn btn-ghost" href="{{ url_for('admin_usuarios') }}">Usuarios</a>{% endif %}
+      <form class="logout-form" method="post" action="{{ url_for('logout') }}"><button class="btn btn-ghost" type="submit">Cerrar sesión</button></form>
+    {% else %}
+      <a class="btn btn-ghost" href="{{ url_for('login') }}">Entrar</a>
+    {% endif %}
+    <a class="cart-btn" href="{{ url_for('carrito') }}" aria-label="Ir al carrito">🛒 Carrito <span class="cnt hide" id="cart-cnt">0</span></a>
   </div>
 </header>
 
@@ -62,7 +69,7 @@
   <div class="wrap">
     <div class="fcols">
       <div>
-        <a class="logo" href="index.html" style="font-size:18px">OmniShop<b>▮</b></a>
+        <a class="logo" href="{{ url_for('index') }}" style="font-size:18px">OmniShop<b>▮</b></a>
         <p style="color:var(--mut);font-size:12.5px;margin-top:8px;max-width:220px">La tienda de tecnología con estética del futuro. Precios reales, fichas técnicas y envío rápido.</p>
       </div>
       <div><h4>Categorías</h4><ul><li>GPUs y tarjetas gráficas</li><li>Procesadores</li><li>Portátiles</li><li>Monitores</li><li>Periféricos</li></ul></div>
@@ -80,6 +87,7 @@
 
 <div class="toasts" id="toasts"></div>
 
-<script src="script.js"></script>
+<script>window.INVENTARIO = {{ productos|tojson }};</script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

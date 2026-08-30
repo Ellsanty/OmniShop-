@@ -41,12 +41,12 @@ def obtener_columnas_tabla(cursor, nombre_tabla):
       """
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_schema = 'public' AND table_name = %s
+      WHERE table_name = %s
       ORDER BY ordinal_position
       """,
       (nombre_tabla,),
     )
-    return {fila[0] for fila in cursor.fetchall()}
+    return {fila["column_name"] for fila in cursor.fetchall()}
 
   columnas = cursor.execute(f"PRAGMA table_info({nombre_tabla})").fetchall()
   return {fila[1] for fila in columnas}

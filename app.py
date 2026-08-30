@@ -252,12 +252,16 @@ def requiere_admin(view):
   return wrapped_view
 
 
-# Ruta principal (Muestra la tienda y los productos de SQLite)
+# Ruta principal (Muestra la tienda y los productos)
 @app.route("/")
 def index():
   conexion = conectar_db()
-  productos = conexion.execute("SELECT * FROM productos").fetchall()
-  conexion.close()
+  try:
+    with conexion.cursor() as cursor:
+      cursor.execute("SELECT * FROM productos")
+      productos = cursor.fetchall()
+  finally:
+    conexion.close()
   return render_template("index.html", productos=[dict(producto) for producto in productos])
 
 

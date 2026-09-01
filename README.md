@@ -1,3 +1,8 @@
+## 👥 Autores y Colaboradores
+* **Santiago José Penso Peña** - Arquitectura Backend, Flask y Despliegue en Netlify
+* **Cristian Diaz** - Gestión de Base de Datos y Configuración de Conexiones
+* **Cristian Cantillo** - Pruebas, Control de Git y Documentación de Rutas
+
 # 🛒 OmniShop - E-commerce Marketplace
 
 Bienvenido a **OmniShop**, una plataforma web tipo marketplace desarrollada como parte de la formación en el programa de Tecnología en Desarrollo de Software en la Universidad de la Costa (CUC).

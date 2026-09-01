@@ -1,21 +1,30 @@
-# 🛒 OmniShop - Mini E-commerce (Marketplace)
+# 🛒 OmniShop - E-commerce Marketplace
 
-Bienvenido a **OmniShop**, un proyecto web tipo marketplace (inspirado en plataformas como MercadoLibre y Amazon), desarrollado como parte de mi formación en el programa de Tecnología en Desarrollo de Software.
+Bienvenido a **OmniShop**, una plataforma web tipo marketplace desarrollada como parte de la formación en el programa de Tecnología en Desarrollo de Software en la Universidad de la Costa (CUC).
 
 ## 🚀 Descripción del Proyecto
-OmniShop es una interfaz web frontend interactiva diseñada para simular una tienda en línea moderna. Permite a los usuarios explorar un catálogo variado de productos, visualizar detalles, filtrar artículos y gestionar un carrito de compras dinámico.
+OmniShop es una aplicación web dinámica de comercio electrónico. A diferencia de una página estática, cuenta con un backend robusto que gestiona autenticación de usuarios (con roles de cliente y administrador), control de inventario en tiempo real, carrito de compras persistente, procesamiento de pedidos y registro de ventas.
 
 ## 🛠️ Tecnologías Utilizadas
-* **HTML5:** Estructura semántica de las páginas (inicio, catálogo, carrito, etc.).
-* **CSS3:** Diseño responsivo, estilos modernos, uso de Flexbox/Grid y una paleta de colores optimizada para e-commerce.
-* **JavaScript (ES6+):** Interactividad del carrito de compras, simulación de búsqueda y dinamismo en la interfaz de usuario.
+* **Backend:** Python con Flask (manejo de rutas, sesiones y lógica del servidor).
+* **Base de Datos:** PostgreSQL (alojada en Supabase) con soporte dual para SQLite en entornos locales.
+* **Frontend:** HTML5, CSS3, JavaScript (ES6+) y plantillas dinámicas con Jinja2.
+* **Control de Versiones y Despliegue:** Git, GitHub y Render (para producción).
 
-## 📂 Estructura del Proyecto
+## 📂 Estructura Principal del Proyecto
 ```text
 omnishop/
 │
-├── index.html       # Página principal (Inicio / Banner de ofertas)
-├── productos.html   # Catálogo general de productos
-├── carrito.html     # Vista del carrito de compras y resumen
-├── style.css        # Estilos generales y diseño visual
-└── script.js        # Lógica de la interfaz y carrito
+├── app.py             # Archivo principal del servidor Flask y rutas
+├── requirements.txt   # Dependencias de Python para producción
+├── Procfile           # Configuración de arranque para Render (Gunicorn)
+├── templates/         # Plantillas HTML dinámicas (Jinja2)
+│   ├── index.html     # Página principal y catálogo
+│   ├── carrito.html   # Vista del carrito de compras
+│   ├── perfil.html    # Gestión de datos del usuario
+│   ├── mis_pedidos.html # Historial de compras del cliente
+│   ├── inventario.html  # Panel de administración de stock
+│   ├── admin_usuarios.html # Gestión de usuarios (Admin)
+│   ├── login.html     # Inicio de sesión
+│   └── registro.html  # Registro de nuevos usuarios
+└── static/            # Archivos estáticos (imágenes de productos, estilos, etc.)
